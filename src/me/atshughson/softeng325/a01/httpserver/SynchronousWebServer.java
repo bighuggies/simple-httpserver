@@ -10,62 +10,62 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class SynchronousWebServer implements WebServer {
-	private static final int PORT = 9000;
+    private static final int PORT = 9000;
 
-	private ServerSocket serverSocket;
+    private ServerSocket serverSocket;
 
-	public SynchronousWebServer() {
-		serverSocket = null;
+    public SynchronousWebServer() {
+        serverSocket = null;
 
-		try {
-			serverSocket = new ServerSocket(PORT);
-			System.out.println("Opening socket on port " + PORT);
-		} catch (IOException e) {
-			System.err.println("Could not open socket on port: " + PORT);
-			System.exit(-1);
-		}
+        try {
+            serverSocket = new ServerSocket(PORT);
+            System.out.println("Opening socket on port " + PORT);
+        } catch (IOException e) {
+            System.err.println("Could not open socket on port: " + PORT);
+            System.exit(-1);
+        }
 
-		System.out.println("Type 'stop' to stop the server");
-	}
+        System.out.println("Type 'stop' to stop the server");
+    }
 
-	@Override
-	public void start() throws IOException {
-		try {
-			while (true) {
-				Socket clientSocket = serverSocket.accept();
+    @Override
+    public void start() throws IOException {
+        try {
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
 
-				BufferedReader in = new BufferedReader(new InputStreamReader(
-						clientSocket.getInputStream()));
-				DataOutputStream out = new DataOutputStream(
-						clientSocket.getOutputStream());
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        clientSocket.getInputStream()));
+                DataOutputStream out = new DataOutputStream(
+                        clientSocket.getOutputStream());
 
-				// Get the incoming request and create a response.
-				Request request = new Request(in);
-				Response response = new Response(request);
+                // Get the incoming request and create a response.
+                Request request = new Request(in);
+                Response response = new Response(request);
 
-				// Send the HTTP response.
-				response.send(out);
+                // Send the HTTP response.
+                response.send(out);
 
-				clientSocket.close();
-			}
-		} catch (SocketException e) {
-			// Do nothing when accept() is interrupted.
-		}
-	}
+                clientSocket.close();
+            }
+        } catch (SocketException e) {
+            // Do nothing when accept() is interrupted.
+        }
+    }
 
-	@Override
-	public void stop() throws IOException {
-		serverSocket.close();
-	}
+    @Override
+    public void stop() throws IOException {
+        serverSocket.close();
+    }
 
-	@Override
-	public void listen(InputStream in) {
-		new Thread(new WebServerInputListener(this, in)).start();
-	}
+    @Override
+    public void listen(InputStream in) {
+        new Thread(new WebServerInputListener(this, in)).start();
+    }
 
-	public static void main(String[] args) throws IOException {
-		WebServer ws = new SynchronousWebServer();
-		ws.listen(System.in);
-		ws.start();
-	}
+    public static void main(String[] args) throws IOException {
+        WebServer ws = new SynchronousWebServer();
+        ws.listen(System.in);
+        ws.start();
+    }
 }

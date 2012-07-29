@@ -12,9 +12,9 @@ public enum HTTPStatusCode {
 	
 	HTTPStatusCode(String text) {
 		this.text = text;
-	}
-	
-	String text() {
+    }
+
+    public String toString() {
 		return text;
 	}
 }
