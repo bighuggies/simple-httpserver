@@ -46,8 +46,7 @@ public class AsynchronousWebServer implements WebServer {
         try {
             while (true) {
                 // Create a worker and pass it the client socket whenever a
-                // request
-                // is received.
+                // request is received.
 
                 WebServerWorker worker = new WebServerWorker(
                         serverSocket.accept());
