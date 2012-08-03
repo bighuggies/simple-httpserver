@@ -9,52 +9,52 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
 public class UDPServer {
-	private static final int PORT = 9000;
-	private static final int BUF_SIZE = 8;
-	private static final int TIMEOUT = 100; // timeout in milliseconds
+    private static final int PORT = 10000;
+    private static final int BUF_SIZE = 8;
+    private static final int TIMEOUT = 100; // timeout in milliseconds
 
-	@SuppressWarnings("resource")
-	public static void main(String[] args) throws IOException {
-		DatagramSocket socket = new DatagramSocket(PORT);
-		InetAddress serverHost = InetAddress.getLocalHost();
+    @SuppressWarnings("resource")
+    public static void main(String[] args) throws IOException {
+        DatagramSocket socket = new DatagramSocket(PORT);
+        InetAddress serverHost = InetAddress.getLocalHost();
 
-		socket.setSoTimeout(TIMEOUT);
+        socket.setSoTimeout(TIMEOUT);
 
-		System.out.println("Server address: " + serverHost.getHostAddress()
-				+ ", " + PORT);
+        System.out.println("Server address: " + serverHost.getHostAddress()
+                + ", " + PORT);
 
-		DatagramPacket packet = new DatagramPacket(new byte[BUF_SIZE], BUF_SIZE);
+        DatagramPacket packet = new DatagramPacket(new byte[BUF_SIZE], BUF_SIZE);
 
-		int count = 0;
-		int outOfOrder = 0;
-		int prev = 0;
-		int curr = 0;
+        int count = 0;
+        int outOfOrder = 0;
 
-		while (true) {
-			try {
-				socket.receive(packet);
+        int prev = 0;
+        int curr = 0;
 
-				ByteArrayInputStream inputByteStream = new ByteArrayInputStream(
-						packet.getData());
-				DataInputStream inputDataStream = new DataInputStream(
-						inputByteStream);
-				curr = inputDataStream.readInt();
+        while (true) {
+            try {
+                socket.receive(packet);
 
-				// System.out.println(curr);
+                ByteArrayInputStream inputByteStream = new ByteArrayInputStream(
+                        packet.getData());
+                DataInputStream inputDataStream = new DataInputStream(
+                        inputByteStream);
 
-				if (curr - prev < 0) {
-					outOfOrder++;
-				}
+                curr = inputDataStream.readInt();
 
-				count++;
-			} catch (SocketTimeoutException e) {
-				if (count > 0) {
-					System.out.println(count + " packets received.");
-					System.out.println(outOfOrder + " packets out of order.");
-					count = 0;
-					outOfOrder = 0;
-				}
-			}
-		}
-	}
+                if (curr - prev < 0) {
+                    outOfOrder++;
+                }
+
+                count++;
+            } catch (SocketTimeoutException e) {
+                if (count > 0) {
+                    System.out.println(count + " packets received.");
+                    System.out.println(outOfOrder + " packets out of order.");
+                    count = 0;
+                    outOfOrder = 0;
+                }
+            }
+        }
+    }
 }

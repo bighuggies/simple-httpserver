@@ -30,6 +30,9 @@ public class SynchronousWebServer implements WebServer {
 
     @Override
     public void start() throws IOException {
+        System.out
+                .println("Listening for incoming connections on port " + PORT);
+
         try {
             while (true) {
                 Socket clientSocket = serverSocket.accept();

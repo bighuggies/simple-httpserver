@@ -28,7 +28,7 @@ public class BufferImplWithJavaConcurrency<T> implements Buffer<T> {
         fElements[fFront] = null;
         fFront = (fFront + 1) % fCapacity;
 
-        notifyAll();
+        notify();
 
         return result;
     }
@@ -41,18 +41,14 @@ public class BufferImplWithJavaConcurrency<T> implements Buffer<T> {
         fElements[fBack] = element;
         fBack = (fBack + 1) % fCapacity;
 
-        notifyAll();
+        notify();
     }
 
-    synchronized public boolean isFull() throws InterruptedException {
-        boolean result = false;
-        result = fFront == fBack && fElements[fFront] != null;
-        return result;
+    public boolean isFull() throws InterruptedException {
+        return fFront == fBack && fElements[fFront] != null;
     }
 
-    synchronized public boolean isEmpty() throws InterruptedException {
-        boolean result = false;
-        result = fFront == fBack && fElements[fFront] == null;
-        return result;
+    public boolean isEmpty() throws InterruptedException {
+        return fFront == fBack && fElements[fFront] == null;
     }
 }

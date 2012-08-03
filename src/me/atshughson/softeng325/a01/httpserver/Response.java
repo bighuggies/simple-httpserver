@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.SocketException;
 
 /***
  * Represents HTTP responses.
@@ -108,7 +109,7 @@ public class Response {
                 + "Server: ahug048 Server\r\n" + "Connection: close\r\n";
 
         if (statusCode != HTTPStatusCode.NOT_FOUND
-                || statusCode != HTTPStatusCode.UNSUPPORTED_MEDIA_TYPE) {
+                && statusCode != HTTPStatusCode.UNSUPPORTED_MEDIA_TYPE) {
             headers += "Content-Type: "
                     + getMimeType(getFileExtension(_request.getUri()))
                     + "\r\n\r\n";
@@ -143,17 +144,22 @@ public class Response {
             statusCode = HTTPStatusCode.UNSUPPORTED_MEDIA_TYPE;
         }
 
-        // First write the headers to the output stream.
-        out.write(getHeaders(statusCode).getBytes());
+        try {
+            // First write the headers to the output stream.
+            out.writeBytes(getHeaders(statusCode));
 
-        // Send the resource.
-        if (resource != null) {
-            int b;
-            while ((b = resource.read()) != -1) {
-                out.write(b);
+            // Send the resource.
+            if (resource != null) {
+                int b;
+                while ((b = resource.read()) != -1) {
+                    out.write(b);
+                }
+
+                resource.close();
             }
-
-            resource.close();
+        } catch (SocketException e) {
+            System.out
+                    .println("Could not service request, socket closed.");
         }
     }
 }
